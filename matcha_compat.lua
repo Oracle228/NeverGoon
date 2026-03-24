@@ -341,4 +341,5 @@ getgenv().Color3 = Color3 -- Matcha already has it
 getgenv().Vector2 = Vector2
 getgenv().notify = notify
 
+getgenv().MatchaCompat = Matcha
 return Matcha

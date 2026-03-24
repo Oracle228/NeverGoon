@@ -1,8 +1,12 @@
 -- [[ Neverlose UI Matcha Loader/Test ]] --
 -- This script demostrates how to use the ported Neverlose UI library in Matcha.
 
-local MatchaCompat = require("matcha_compat")
-local NeverLose = require("matcha_neverlose")
+local function Get(url)
+    return game:HttpGet(url)
+end
+
+loadstring(Get("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_compat.lua"))()
+local NeverLose = loadstring(Get("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_neverlose.lua"))()
 
 -- [[ Application Logic ]] --
 local Window = NeverLose:CreateWindow({

@@ -3,7 +3,7 @@
     Ported by Antigravity
 ]]
 
-local MatchaCompat = require("matcha_compat")
+local MatchaCompat = getgenv().MatchaCompat or require("matcha_compat")
 local TweenService = getgenv().TweenService
 local UserInputService = getgenv().UserInputService
 local RunService = getgenv().RunService
