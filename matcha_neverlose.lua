@@ -242,11 +242,7 @@ function NeverLose:RegisiterHandler(Handler, Signal)
     local ZIndex = Handler.ZIndex or 1
 
     function handle:AddToggle(Config)
-        Config = NeverLose:ProcessParams(Config, {
-            Default = false,
-            Flag = nil,
-            Callback = function() end,
-        })
+        Config = NeverLose:ProcessParams(Config, { Default = false, Flag = nil, Callback = function() end, })
 
         local Toggle = Instance.new("Frame", Handler)
         Toggle.Size = UDim2.new(0, 30, 0, 18)
