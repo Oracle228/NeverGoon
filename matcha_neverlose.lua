@@ -469,4 +469,5 @@ function NeverLose:RegisiterHandler(Handler, Signal)
     return handle
 end
 
+getgenv().NeverLose = NeverLose
 return NeverLose

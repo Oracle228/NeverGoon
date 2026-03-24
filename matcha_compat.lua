@@ -281,44 +281,6 @@ task.spawn(function()
             end
         end
 
-        -- Update Input & Layout
-        for _, obj in ipairs(UI_OBJECTS) do
-            -- Layout Update
-            if not obj._parent then
-                obj:UpdateAbsolute()
-            end
-
-            -- UIListLayout (Child positioning)
-            if obj.ClassName == "UIListLayout" and obj._parent then
-                local yOffset = 0
-                for _, child in ipairs(obj._parent.Children) do
-                    if child ~= obj and child.Visible then
-                        child.Position = Matcha.UDim2.new(child.Position.X.Scale, child.Position.X.Offset, 0, yOffset)
-                        yOffset = yOffset + child.AbsoluteSize.Y + (obj.Padding or 0)
-                    end
-                end
-            end
-
-            -- Input Handling
-            if obj.Visible and (not obj._parent or obj._parent.Visible) then
-                local over = mousePos.X >= obj.AbsolutePosition.X and mousePos.X <= obj.AbsolutePosition.X + obj.AbsoluteSize.X
-                        and mousePos.Y >= obj.AbsolutePosition.Y and mousePos.Y <= obj.AbsolutePosition.Y + obj.AbsoluteSize.Y
-                
-                if over and not obj._hovered then
-                    obj._hovered = true
-                    if obj._onMouseEnter then obj._onMouseEnter() end
-                elseif not over and obj._hovered then
-                    obj._hovered = false
-                    if obj._onMouseLeave then obj._onMouseLeave() end
-                end
-
-                if over and m1 and not lastM1 then
-                    obj._pressed = true
-                    if obj._onInputBegan then obj._onInputBegan({ UserInputType = Enum.UserInputType.MouseButton1 }) end
-                elseif obj._pressed and not m1 then
-                    obj._pressed = false
-                    if obj._onInputEnded then obj._onInputEnded({ UserInputType = Enum.UserInputType.MouseButton1 }) end
-                end
             end
         end
         

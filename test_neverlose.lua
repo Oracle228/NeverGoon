@@ -5,8 +5,19 @@ local function Get(url)
     return game:HttpGet(url)
 end
 
-loadstring(Get("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_compat.lua"))()
-local NeverLose = loadstring(Get("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_neverlose.lua"))()
+local function SafeLoad(url)
+    local code = Get(url)
+    if not code or code == "" then error("Failed to fetch: " .. url) end
+    local func, err = loadstring(code)
+    if not func then error("Syntax error in " .. url .. ": " .. err) end
+    local success, runErr = pcall(func)
+    if not success then error("Runtime error in " .. url .. ": " .. runErr) end
+end
+
+SafeLoad("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_compat.lua")
+SafeLoad("https://raw.githubusercontent.com/Oracle228/NeverGoon/refs/heads/main/matcha_neverlose.lua")
+
+local NeverLose = getgenv().NeverLose -- matcha_neverlose should set this
 
 -- [[ Application Logic ]] --
 local Window = NeverLose:CreateWindow({
