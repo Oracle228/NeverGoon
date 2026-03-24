@@ -18,7 +18,9 @@ getgenv = getgenv or getfenv;
 
 local LOAD_ENV = LPH_NO_VIRTUALIZE(function()
 	local isMatcha = type(identifyexecutor) == "function" and string.find(identifyexecutor(), "Matcha")
-	if game:GetService('RunService'):IsStudio() or isMatcha then
+	local isStudio = false
+	pcall(function() isStudio = game:GetService('RunService'):IsStudio() end)
+	if isStudio or isMatcha then
 		local BaseWorkspace = Instance.new('Folder',game:GetService("ReplicatedFirst"));
 
 		BaseWorkspace.Name = 'PRI\0.'..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)));
@@ -896,7 +898,9 @@ function NeverLose:MoreThanHalfY(Value: number)
 	return (NeverLose.ScreenGui.AbsoluteSize.Y / 2) < Value
 end;
 
-NeverLose.IsStudio = RunService:IsStudio();
+local safeIsStudio = false
+pcall(function() safeIsStudio = RunService:IsStudio() end)
+NeverLose.IsStudio = safeIsStudio;
 NeverLose.IsMobile = UserInputService.TouchEnabled;
 
 NeverLose.CreateInput = LPH_NO_VIRTUALIZE(function(self , Frame , Callback)
