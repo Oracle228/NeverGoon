@@ -243,7 +243,10 @@ local UserInputService = {
 
 -- [[ Global Loop ]] --
 task.spawn(function()
-    local lastMousePos = Vector2.new(0, 0)
+    local Players = game:GetService("Players")
+    while not Players.LocalPlayer do task.wait() end
+    local LocalPlayer = Players.LocalPlayer
+    local Mouse = LocalPlayer:GetMouse()
     local lastM1 = false
 
     while true do
@@ -257,7 +260,7 @@ task.spawn(function()
             local tween = ACTIVE_TWEENS[i]
             local elapsed = now - tween.StartTime
             local alpha = math.clamp(elapsed / tween.Duration, 0, 1)
-            local t = tween.EasingStyle(alpha)
+            local t = (typeof(tween.EasingStyle) == "function" and tween.EasingStyle(alpha)) or alpha
 
             for k, goal in pairs(tween.Goals) do
                 local start = tween.StartValues[k]
@@ -273,19 +276,56 @@ task.spawn(function()
                         lerp(start.Y.Offset, goal.Y.Offset, t)
                     )
                 end
-                tween.Object._dirty = true
             end
-
-            if alpha >= 1 then
-                table.remove(ACTIVE_TWEENS, i)
-            end
+            if alpha >= 1 then table.remove(ACTIVE_TWEENS, i) end
         end
 
+        -- Update UI Objects
+        for _, obj in pairs(UI_OBJECTS) do
+            if not obj._drawing then continue end
+            
+            -- Recalculate AbsolutePosition/Size
+            local absPos = Vector2.new(obj.Position.X.Offset, obj.Position.Y.Offset)
+            local absSize = Vector2.new(obj.Size.X.Offset, obj.Size.Y.Offset)
+            if obj._parent and obj._parent.AbsolutePosition then
+                absPos = obj._parent.AbsolutePosition + absPos
+            end
+            obj.AbsolutePosition, obj.AbsoluteSize = absPos, absSize
+
+            -- Update Drawing
+            obj._drawing.Visible = obj.Visible
+            if obj.ClassName == "Frame" or obj.ClassName == "ScrollingFrame" then
+                obj._drawing.Position = absPos
+                obj._drawing.Size = absSize
+                obj._drawing.Color = obj.BackgroundColor3
+                obj._drawing.Transparency = 1 - obj.BackgroundTransparency
+            elseif obj.ClassName:find("Text") then
+                obj._drawing.Position = absPos
+                obj._drawing.Text = obj.Text
+                obj._drawing.Color = obj.TextColor3
+                obj._drawing.Transparency = 1 - obj.TextTransparency
+            end
+
+            -- Input Detection
+            local over = mousePos.X >= absPos.X and mousePos.X <= absPos.X + absSize.X 
+                     and mousePos.Y >= absPos.Y and mousePos.Y <= absPos.Y + absSize.Y
+            
+            if over and not obj._h then
+                obj._h = true
+                if obj._onMouseEnter then obj._onMouseEnter() end
+            elseif not over and obj._h then
+                obj._h = false
+                if obj._onMouseLeave then obj._onMouseLeave() end
+            end
+
+            if over and m1 and not lastM1 then
+                if obj._onInputBegan then obj._onInputBegan({ UserInputType = Enum.UserInputType.MouseButton1 }) end
+                if obj._onClick then obj._onClick() end
+            elseif lastM1 and not m1 then
+                if obj._onInputEnded then obj._onInputEnded({ UserInputType = Enum.UserInputType.MouseButton1 }) end
             end
         end
-        
         lastM1 = m1
-        lastMousePos = mousePos
     end
 end)
 
